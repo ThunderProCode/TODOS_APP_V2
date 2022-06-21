@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { ITodoData } from '../Interfaces/todos.interface';
 import todoService from './todos.service';
+import { ITodoForm } from '../Interfaces/forms.interfaces';
 
 const initialState = {
     todos: [],
@@ -13,7 +14,7 @@ const initialState = {
 // Create new Todo
 export const createTodo = createAsyncThunk(
     'todos/create',
-   async (todoText:string, thunkAPI) => {
+   async (todoText:ITodoForm, thunkAPI) => {
     try {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
@@ -55,12 +56,12 @@ export const getTodos = createAsyncThunk(
 // Update User Todo
 export const updateTodo = createAsyncThunk(
     'todos/udpate',
-   async (todoData:ITodoData, thunkAPI) => {
+   async (todoId:string, thunkAPI) => {
         try {
              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             const token = thunkAPI.getState().auth.user.token;
-            return await todoService.udpateTodo(todoData, token);
+            return await todoService.udpateTodo(todoId, token);
         } catch (error:any) {
         const message = 
             (error.response &&

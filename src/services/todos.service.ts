@@ -1,10 +1,11 @@
 import axios from "axios";
 import { ITodoData } from '../Interfaces/todos.interface';
+import { ITodoForm } from '../Interfaces/forms.interfaces';
 axios.defaults.baseURL = 'http://localhost:8000/api';
 const API_URL = '/todos/';
 
 // Create new Todo
-const createTodo =async (todoText: string, token:string) => {
+const createTodo =async (todoText: ITodoForm, token:string) => {
     const config = {
         headers: {
             Authorization: `Bearer ${token}`,
@@ -27,14 +28,16 @@ const getTodos =async (token:string) => {
 }
 
 // UPDATE TODO
-const udpateTodo = async (todoData:ITodoData,token:string) => {
+const udpateTodo = async (todoId:string,token:string) => {
     const config = {
         headers: {
             Authorization: `Bearer ${token}`,
         },
     }
-
-    const response = await axios.put(API_URL + todoData.id,todoData.completed,config);
+   
+    const todo = await axios.get(API_URL + todoId, config);
+    const update = await axios.put(API_URL + todoId,{completed:!todo.data.completed},config);
+    const response = await axios.get(API_URL, config);
     return response.data;
 }
 

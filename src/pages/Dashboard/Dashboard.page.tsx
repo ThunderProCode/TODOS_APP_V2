@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { reset } from "../../services/auth.slice";
@@ -7,16 +7,26 @@ import { PageTitle } from "../../Styles/Titles.styles";
 import { TodoIconContainer, TodoInput, TodosContainer, TodosHeader, TodosList } from "../../Styles/Todos.styles";
 import { MdAdd } from 'react-icons/md';
 import { TodoItem } from "../../Components/Todos/TodoIterm";
-import { getTodos } from "../../services/todos.slice";
+import { getTodos,createTodo } from "../../services/todos.slice";
 import { ITodo } from '../../Interfaces/todos.interface';
+import { ITodoForm } from '../../Interfaces/forms.interfaces';
+
+const initialState:ITodoForm = {
+    text: '',
+}
 
 const Dashboard = () => {
+
+    const [formData, setFormData] = useState<ITodoForm>(initialState);
+    const { text } = formData;
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    const { user } = useSelector((state:IStore) => state.auth);
-    const { todos, isLoading, isError, message }  = useSelector((state) => state.todos)
+    const { user,isLoading } = useSelector((state:IStore) => state.auth);
+    const { todos,isError, message }  = useSelector((state) => state.todos)
+
+
 
     useEffect(() => {
         if(isError){
@@ -39,6 +49,17 @@ const Dashboard = () => {
         return (<h1>Loading...</h1>);
     }
 
+    const handleSubmit = () => {
+        dispatch(createTodo(formData));
+    }
+
+    const handleChange = (e:React.FormEvent) => {
+        setFormData((prevstate) => ({
+            ...prevstate,
+            [e.target.name]: e.target.value,
+        }));
+    }
+
     return(
         <>
             <PageTitle>Dashboard</PageTitle>
@@ -46,8 +67,12 @@ const Dashboard = () => {
                 <TodosHeader>
                     <TodoInput type="text"
                                 placeholder="Enter todo"
+                                id="text"
+                                name="text"
+                                value={text}
+                                onChange={handleChange}
                     />
-                    <TodoIconContainer>
+                    <TodoIconContainer onClick={handleSubmit}>
                         <MdAdd/>
                     </TodoIconContainer>
                 </TodosHeader>
@@ -57,8 +82,8 @@ const Dashboard = () => {
                             <TodoItem   user={todo.user}
                                         text={todo.text}
                                         completed={todo.completed}
-                                        id={todo.id}
-                                        key={todo.id} 
+                                        id={todo._id}
+                                        key={todo.text} 
                             /> 
                         )
                     }
