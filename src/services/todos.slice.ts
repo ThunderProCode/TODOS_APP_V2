@@ -1,9 +1,10 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { ITodoData } from '../Interfaces/todos.interface';
+import { ITodoData, ITodo, ITodosInitialState } from '../Interfaces/todos.interface';
 import todoService from './todos.service';
 import { ITodoForm } from '../Interfaces/forms.interfaces';
+import { IState, IStore } from '../Interfaces/state.interface';
 
-const initialState = {
+const initialState:ITodosInitialState = {
     todos: [],
     isError: false,
     isSuccess: false,
@@ -56,12 +57,12 @@ export const getTodos = createAsyncThunk(
 // Update User Todo
 export const updateTodo = createAsyncThunk(
     'todos/udpate',
-   async (todoId:string, thunkAPI) => {
+   async (todoData:ITodoData, thunkAPI) => {
         try {
              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             const token = thunkAPI.getState().auth.user.token;
-            return await todoService.udpateTodo(todoId, token);
+            return await todoService.udpateTodo(todoData, token);
         } catch (error:any) {
         const message = 
             (error.response &&
@@ -81,7 +82,8 @@ export const deleteTodo = createAsyncThunk(
     try {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        const token = thunkAPI.getState().auth.user.token;
+        const state:IStore = thunkAPI.getState();
+        const token = state.auth.user.token;
         return await todoService.deleteTodo(id,token);
     } catch (error:any) {
         const message = 
@@ -139,9 +141,11 @@ export const todoSlice = createSlice({
             .addCase(deleteTodo.fulfilled, (state,action) => {
                 state.isLoading = false
                 state.isSuccess = true
-                state.todos = state.todos.filter(
-                    (todo) => todo.id !== action.payload.id
-                )
+                const todos:ITodo[] = state.todos;
+                const todoIndex = todos.findIndex(todo => {
+                    return todo.id == action.payload.id;
+                });
+                todos.splice(todoIndex,1);
             })
             .addCase(deleteTodo.rejected, (state, action) => {
                 state.isLoading = false

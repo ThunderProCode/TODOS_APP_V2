@@ -1,6 +1,6 @@
 export interface ITodoData {
     id:string,
-    completed: boolean
+    isCompleted: boolean
 }
 
 export interface ITodo {
@@ -8,4 +8,12 @@ export interface ITodo {
     text: string;
     completed: boolean;
     id: string;
+}
+
+export interface ITodosInitialState {
+    todos:ITodo[];
+    isError: boolean;
+    isSuccess: boolean;
+    isLoading: boolean;
+    message: string;
 }

@@ -1,28 +1,39 @@
-import React from "react";
+import React, { useState } from "react";
 import { TodoItemContainer } from "../../Styles/Todos.styles";
 import { AiFillCheckSquare,AiOutlineBorder,AiOutlineDelete } from 'react-icons/ai';
-import { ITodo } from '../../Interfaces/todos.interface';
+import { ITodo, ITodoData } from '../../Interfaces/todos.interface';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../app/store';
-import { updateTodo } from "../../services/todos.slice";
+import { deleteTodo, updateTodo } from "../../services/todos.slice";
 
-export const TodoItem = ({user,text,completed,id}:ITodo) => {
+export const TodoItem = ({text,completed,id}:ITodo) => {
 
+    const [ isCompleted, setIsCompleted ] = useState(completed);
     const dispatch = useDispatch<AppDispatch>();
 
     const toggleTodo = () => {
-        dispatch(updateTodo(id));
+
+        setIsCompleted( (prevstate) => !prevstate );
+        const todoData:ITodoData = {
+            id,
+            isCompleted
+        }
+        dispatch(updateTodo(todoData));
+    }
+
+    const handleDelete = () => {
+        dispatch(deleteTodo(id));
     }
 
     return(
         <>
             <TodoItemContainer>
                 {
-                    completed ? <AiFillCheckSquare onClick={toggleTodo} /> :
+                    isCompleted ? <AiFillCheckSquare onClick={toggleTodo} /> :
                     <AiOutlineBorder onClick={toggleTodo}/>
                 }
                     <p>{text}</p>
-                <AiOutlineDelete/>
+                <AiOutlineDelete onClick={handleDelete}/>
             </TodoItemContainer>
         </>
     );

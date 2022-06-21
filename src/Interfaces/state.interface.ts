@@ -1,4 +1,5 @@
 import { IUser } from './user.interface';
+import { ITodosInitialState } from './todos.interface';
 
 export interface IState {
     user: IUser;
@@ -8,6 +9,8 @@ export interface IState {
     message: string;
 }
 
+
 export interface IStore {
     auth:IState;
+    todos:ITodosInitialState;
 }
